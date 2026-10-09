@@ -44,10 +44,10 @@ export class PcaProjection {
 }
 
 /**
- * Positional debiasing (INSID3): remove the positional subspace B from patch embeddings, x' = (I - B^T B) x, then
- * renormalise. P = I - B^T B is symmetric, so cos(t, x') = (P t) . x / |P x|: only the query is projected, and the
- * per-token norm comes from the PCA codes (z is the dequantised code):
- * |P x|^2 = a + 2 b.z + z^T G z with G = C P C^T, b = C P mean and a = mean^T P mean.
+ * Positional debiasing (INSID3): project the positional subspace B out of both the patch embedding and the query,
+ * P = I - B^T B, and compare the renormalised results. P is symmetric and idempotent, so
+ * cos(P t, P x) = (P t / |P t|) . x / |P x|: only the query is projected, and the per-token norm comes from the PCA
+ * codes (z is the dequantised code): |P x|^2 = a + 2 b.z + z^T G z with G = C P C^T, b = C P mean and a = mean^T P mean.
  */
 export class PositionalDebias {
   /** @param {Float32Array} basis nb * dim floats, orthonormal rows  @param {PcaProjection} pca */
@@ -87,6 +87,48 @@ export class PositionalDebias {
     Q[k * m + k] = a;
     for (let j = 0; j < m; j++) for (let l = j + 1; l < m; l++) Q[j * m + l] *= 2;
     this.Q = Float32Array.from(Q);
+    this.norms = new WeakMap();
+  }
+
+  /** P t / |P t|: the debiased query, to score against tokens scaled by invNorm. */
+  query(t) {
+    const out = this.projectOut(t);
+    let sq = 0;
+    for (const v of out) sq += v * v;
+    const n = Math.sqrt(sq) || 1;
+    for (let d = 0; d < out.length; d++) out[d] /= n;
+    return out;
+  }
+
+  /** |P t| = sqrt(|t|^2 - |B t|^2), cached per embedding (for shift-click lookups over the whole vocabulary). */
+  textNorm(t) {
+    let n = this.norms.get(t);
+    if (n === undefined) {
+      const { basis, nb } = this;
+      const dim = this.pca.dim;
+      let sq = 0;
+      for (let d = 0; d < dim; d++) sq += t[d] * t[d];
+      for (let r = 0, off = 0; r < nb; r++, off += dim) {
+        let u = 0;
+        for (let d = 0; d < dim; d++) u += basis[off + d] * t[d];
+        sq -= u * u;
+      }
+      n = Math.sqrt(Math.max(sq, 1e-6));
+      this.norms.set(t, n);
+    }
+    return n;
+  }
+
+  /** Fills the textNorm cache for many embeddings without blocking the page. */
+  async warmTextNorms(embeddings) {
+    let lastYield = performance.now();
+    for (const t of embeddings) {
+      this.textNorm(t);
+      if (performance.now() - lastYield > 30) {
+        await new Promise((resolve) => setTimeout(resolve));
+        lastYield = performance.now();
+      }
+    }
   }
 
   /** t - B^T (B t) */
@@ -217,9 +259,10 @@ export function ensembleEmbedding(data, batch, [start, end]) {
  * Greedy retrieval of the strings whose text embeddings best match one pixel's patch embedding.
  * @param {Float32Array} x patch embedding (e.g. EmbeddingIndex.pixelEmbedding)
  * @param {{strings: string[], embeddings: Float32Array[]}[]} sources candidate sets of L2-normalised text embeddings
+ * @param {((t: Float32Array) => number)?} textNorm divides each text's cosine (|P t| when x is debiased, P x)
  * @returns {{text: string, cos: number, prob: number}[]} top `count` by cosine; prob is a softmax over all candidates
  */
-export function topStrings(x, sources, scale, count = 10) {
+export function topStrings(x, sources, scale, count = 10, textNorm = null) {
   let norm = 0;
   for (const v of x) norm += v * v;
   norm = Math.sqrt(norm) || 1;
@@ -232,7 +275,7 @@ export function topStrings(x, sources, scale, count = 10) {
       const t = embeddings[i];
       let dot = 0;
       for (let d = 0; d < x.length; d++) dot += t[d] * x[d];
-      all.push({ text: strings[i], cos: dot / norm });
+      all.push({ text: strings[i], cos: dot / norm / (textNorm ? textNorm(t) : 1) });
     }
   }
   if (!all.length) return [];

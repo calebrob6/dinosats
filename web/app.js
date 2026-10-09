@@ -48,8 +48,9 @@ const state = {
   timing: {},
   vocab: null, // {strings, embeddings, index}: precomputed text embeddings (shift-click lookup and known prompts)
   point: null, // {x, y, region, index}: the shift-clicked token
-  debias: null, // PositionalDebias while "Remove positional bias" is on, else null
-  debiasParts: null, // {debias, norm}: the loaded positional basis and the offline per-token norm of the global level
+  debias: null, // PositionalDebias while "Remove positional bias" is on (the default), else null
+  debiasReady: null, // promise of the PositionalDebias built from the scene's positional basis (loaded once)
+  posnorm: null, // promise of the offline per-token norm of the final global level (loaded with that level)
   embeddingBytes: 0, // size of the embedding COG on disk
   facts: null, // scene numbers for the help tour (see describeScene)
 };
@@ -395,7 +396,7 @@ async function loadLevel(level) {
 /** Makes a fully loaded level the global region and rescores the current query on it. */
 async function setGlobal(level, codes, final) {
   const region = makeRegion("global", level, 0, 0, level.width, level.height, codes);
-  while (state.debias && !region.inv) await ensureInv(region);
+  while (state.debias && !region.inv) await ensureInv(region, final, !state.global);
   state.global = region;
   state.globalFinal = final;
   state.grid = { extent: state.extent, width: level.width, height: level.height, res: level.res[0] };
@@ -689,12 +690,12 @@ function updateBackground() {
 function promptWeights(prompt) {
   if (!state.weights.has(prompt)) {
     const t = state.embeddings.get(prompt);
-    state.weights.set(prompt, state.projector.weights(state.debias ? state.debias.projectOut(t) : t));
+    state.weights.set(prompt, state.projector.weights(state.debias ? state.debias.query(t) : t));
   }
   return state.weights.get(prompt);
 }
 
-/** cos(t, x) of every token of a region, or cos(t, x') after positional debiasing (see PositionalDebias). */
+/** cos(t, x) of every token of a region, or cos(P t, P x) after positional debiasing (see PositionalDebias). */
 function scoreRegion(region, prompt) {
   const out = cosine(region.codes, promptWeights(prompt));
   if (state.debias) for (let i = 0; i < out.length; i++) out[i] *= region.inv[i];
@@ -801,9 +802,15 @@ function updateMatches() {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Positional debiasing (debug only)
+// Positional debiasing: on by default; ?debias=0 (or the debug toggle) turns it off.
 
 const loadFloats = (url) => fetchOk(url).then((r) => r.arrayBuffer()).then((b) => new Float32Array(b));
+
+function loadDebias() {
+  state.debiasReady ??= Promise.all([loadFloats(state.scene.posbasis), pcaReady]).then(([basis]) => new PositionalDebias(basis, state.projector));
+  state.debiasReady.catch(() => (state.debiasReady = null)); // retried the next time it is turned on
+  return state.debiasReady;
+}
 
 /** Drops everything derived from the embeddings' scores (not the embeddings themselves). */
 function resetScores() {
@@ -814,24 +821,37 @@ function resetScores() {
   Object.assign(state.global, { bg: null, cos: null, values: null, canvas: null });
 }
 
-/** Per-token norm correction of a region after debiasing: from the offline `posnorm` file when it fits, else computed. */
-async function ensureInv(region) {
+/**
+ * Per-token norm correction of a region after debiasing: for the final global level from the offline `posnorm` file
+ * when it fits, else computed (with progress in the status line if `verbose`).
+ */
+async function ensureInv(region, final, verbose = true) {
   if (!state.debias || region.inv) return;
-  const { norm } = state.debiasParts;
-  region.inv = norm?.length === region.width * region.height ? norm : await state.debias.invNorm(region.codes, (f) => setStatus(`Computing positional correction ${Math.round(100 * f)}%…`));
+  if (final && state.scene.posnorm) {
+    state.posnorm ??= loadFloats(state.scene.posnorm).catch((err) => (console.warn("no precomputed positional norms", err), null));
+    const norm = await state.posnorm;
+    if (norm?.length === region.width * region.height) {
+      region.inv = norm;
+      return;
+    }
+  }
+  const progress = verbose ? (f) => setStatus(`Computing positional correction ${Math.round(100 * f)}%…`) : null;
+  region.inv = await state.debias.invNorm(region.codes, progress);
 }
 
 // Enables or disables positional debiasing; streamed blocks compute their own correction as they load.
 async function applyDebias() {
   const want = $("debias").checked && !!state.scene.posbasis;
-  if (want && !state.debiasParts) {
-    setStatus("Loading positional basis…");
-    const [basis, norm] = await Promise.all([loadFloats(state.scene.posbasis), state.scene.posnorm ? loadFloats(state.scene.posnorm).catch(() => null) : null]);
-    state.debiasParts = { debias: new PositionalDebias(basis, state.projector), norm };
-  }
-  state.debias = want ? state.debiasParts.debias : null;
-  while (state.debias && !state.global.inv) await ensureInv(state.global); // the global region may be replaced meanwhile
+  if (want && !state.debiasReady) setStatus("Loading positional basis…");
+  state.debias = want ? await loadDebias() : null;
+  while (state.debias && !state.global.inv) await ensureInv(state.global, state.globalFinal); // the global region may be replaced meanwhile
   resetScores();
+  warmTextNorms();
+}
+
+/** Precomputes |P t| of the vocabulary in the background, so the first shift-click lookup is quick. */
+function warmTextNorms() {
+  vocabReady.then((vocab) => vocab && state.debias?.warmTextNorms(vocab.embeddings));
 }
 
 function formatCount(n) {
@@ -1012,7 +1032,8 @@ function renderPoint() {
   // Candidates: the precomputed vocabulary plus every other prompt encoded this session (queries and background).
   const extra = [...state.embeddings].filter(([p]) => !state.vocab.index.has(normalizePrompt(p)));
   const typed = { strings: extra.map(([p]) => p), embeddings: extra.map(([, t]) => t) };
-  const top = topStrings(x, [state.vocab, typed], state.pca.text.logit_scale, 10);
+  const textNorm = state.debias ? (t) => state.debias.textNorm(t) : null;
+  const top = topStrings(x, [state.vocab, typed], state.pca.text.logit_scale, 10, textNorm);
   info.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
   info.title = `${res.toFixed(1)} m token; cosine, then softmax share over ${state.vocab.strings.length + typed.strings.length} strings`;
   list.replaceChildren(
@@ -1195,6 +1216,9 @@ async function main() {
   const target = state.levels.find((l) => l.width * l.height <= maxTokens) ?? state.levels.at(-1);
   const preview = state.levels.find((l) => l.width * l.height <= PREVIEW_TOKENS && l.index > target.index) ?? target;
   const previewCodes = loadLevel(preview);
+  // Positional debiasing is on unless ?debias=0 (set explicitly: the browser may restore the hidden switch).
+  $("debias").checked = !!scene.posbasis && params.get("debias") !== "0";
+  const debiasReady = $("debias").checked ? loadDebias() : null;
   setStatus("Loading embeddings…");
   state.projection = defineProjection(header.epsg);
   buildMap(naipSource, state.projection, state.extent);
@@ -1203,16 +1227,21 @@ async function main() {
   if (header.bands !== pca.n_components) throw new Error(`${scene.embeddings} has ${header.bands} bands, PCA model has ${pca.n_components}`);
   describeScene();
   setupHelp();
-  await setGlobal(preview, await previewCodes, preview === target);
-  if (params.get("debias") === "1") {
-    $("debias").checked = true;
-    await applyDebias();
+  if (debiasReady) {
+    try {
+      state.debias = await debiasReady;
+    } catch (err) {
+      console.warn("could not load the positional basis; scoring without debiasing", err);
+      $("debias").checked = false;
+    }
   }
+  await setGlobal(preview, await previewCodes, preview === target);
   await updateBackground();
   updateLegend();
   setStatus("Ready");
   updateTiming();
   done();
+  warmTextNorms();
   if (preview !== target) refineGlobal(target);
 
   for (const id of ["mode-relative", "mode-raw"]) {
@@ -1282,6 +1311,9 @@ window.__app = {
   state,
   setQuery,
   fetches,
+  get map() {
+    return map;
+  },
   get heatVisible() {
     return heatLayer?.getVisible();
   },

@@ -64,7 +64,8 @@ for (const q of [...queries, novel]) {
   const t = Date.now();
   await page.fill("#query", q);
   await page.press("#query", "Enter");
-  await page.waitForFunction((q) => document.getElementById("status").textContent === `Showing “${q}”`, q, { timeout: 60_000 });
+  // The novel query downloads and initializes the 664 MB text encoder, which can take minutes on a slow host.
+  await page.waitForFunction((q) => document.getElementById("status").textContent === `Showing “${q}”`, q, { timeout: q === novel ? 300_000 : 60_000 });
   const r = await page.evaluate(() => {
     const { current, session } = window.__app.state;
     let above = 0;
@@ -155,19 +156,26 @@ const afterClick = await cards();
 console.log("collapsed after shift-click:", afterClick);
 ok &&= afterClick.matches && !afterClick.point;
 
-// Positional debiasing: scores are recomputed for the global region and the streamed blocks.
-await page.check("#debias");
-await page.waitForFunction(() => /^Showing/.test(document.getElementById("status").textContent) && window.__app.state.debias, null, { timeout: 120_000 });
-await page.waitForTimeout(2000);
-const debiased = await page.evaluate(() => {
-  const { state } = window.__app;
-  const blocks = [...state.blocks.values()];
-  return { global: !!state.global.inv, blocks: blocks.length, blocksOk: blocks.every((b) => b.inv), peaks: state.current.peaks.length, point: document.querySelectorAll("#point-matches li").length };
-});
-console.log("debiased:", debiased);
-ok &&= debiased.global && debiased.blocksOk && debiased.peaks > 0 && debiased.point === 10;
-await page.uncheck("#debias");
-await page.waitForFunction(() => /^Showing/.test(document.getElementById("status").textContent) && !window.__app.state.debias, null, { timeout: 60_000 });
+// Positional debiasing is on by default; turning it off and on again rescores the global region and the streamed blocks.
+const debiasState = () =>
+  page.evaluate(() => {
+    const { state } = window.__app;
+    const blocks = [...state.blocks.values()];
+    return { on: !!state.debias, global: !!state.global.inv, blocks: blocks.length, blocksOk: blocks.every((b) => !!b.inv === !!state.debias), peaks: state.current.peaks.length, point: document.querySelectorAll("#point-matches li").length };
+  });
+const toggleDebias = async (on) => {
+  await (on ? page.check("#debias") : page.uncheck("#debias"));
+  await page.waitForFunction((on) => /^Showing/.test(document.getElementById("status").textContent) && !!window.__app.state.debias === on && !document.getElementById("debias").disabled, on, { timeout: 120_000 });
+  await page.waitForTimeout(2000);
+  return debiasState();
+};
+const debiasDefault = await debiasState();
+const debiasOff = await toggleDebias(false);
+const debiasOn = await toggleDebias(true);
+console.log("debias by default:", debiasDefault, "off:", debiasOff, "on again:", debiasOn);
+ok &&= debiasDefault.on && debiasDefault.global && debiasDefault.blocksOk;
+ok &&= !debiasOff.on && debiasOff.blocksOk && debiasOff.peaks > 0 && debiasOff.point === 10;
+ok &&= debiasOn.on && debiasOn.global && debiasOn.blocksOk && debiasOn.peaks > 0 && debiasOn.point === 10;
 
 // Re-scoring (debias) leaves the cards alone; a new query minimizes the point's phrases and shows the top matches.
 const afterDebias = await cards();

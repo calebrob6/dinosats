@@ -46,7 +46,7 @@ Browsers only allow the service worker, Cache API and cross-origin isolation on 
 3. **Scoring.** The half of the text embedding that is aligned with patch tokens is L2-normalised and projected through the same PCA, so its cosine with a token is a 64-d dot product on the uint8 codes: `cos(t, x) ≈ t · mean + (C t) · z`. Raw single-prompt cosines are noisy and hard to threshold, so by default each token shows a softmax of the query against the background prompts (with dino.txt's logit scale of 100). Raw cosine is one click away.
 4. **Level-of-detail streaming.** The app downloads the finest COG overview with at most 2.5 M tokens (the 19.2 m level, about 1 M tokens and 51 MB for San Diego) and scores it for every query; that drives the scene-wide heatmap and top matches. A 38.4 m level (13 MB) loads first, so the app is usable within a few seconds. When you zoom in, it streams the 256 × 256-token blocks (2–3 MB each) of a finer level that cover the view, centre first, and scores each one as it arrives: 9.6 m tokens, then 4.8 m once they are less than 3 screen pixels wide. Small objects are diluted at 19.2 m, so they appear when you zoom in but may be missed by the scene-wide top matches.
 
-DINOv3 patch features depend on their position in the window. At a 512 px stride this shows up on flat content as a pattern repeating every window stride (open ocean scoring in 300 m blobs for "boats"), which a 256 px stride removes, at 4× the compute. The app can also project out a positional subspace, following [INSID3](https://github.com/visinf/INSID3) (see `?debias=1` below).
+DINOv3 patch features depend on their position in the window. At a 512 px stride this shows up on flat content as a pattern repeating every window stride (open ocean scoring in 300 m blobs for "boats"), which a 256 px stride removes, at 4× the compute. The app also removes the positional bias by default, following [INSID3](https://github.com/visinf/INSID3): `embed.py` embeds a blank image, and the top 500 singular vectors of its patch tokens span a positional subspace that is projected out of both the query and the tokens before taking the cosine. Only the query needs projecting (the projection is symmetric), and each token's norm after the projection is a 65 × 65 quadratic form on its PCA codes, precomputed for the scene-wide level (`?debias=0` turns it off).
 
 ## Pipeline
 
@@ -123,7 +123,7 @@ On first load a help tour introduces the app, with the scene's area, pixel count
 |:------------------|:---------------------------------------------------------------------------------------------------------|
 | `?config=<url>`   | Load another config (default `config.json`), resolved against the page                                  |
 | `?debug=true`     | Show developer controls: NAIP imagery and positional-bias toggles, and a timing bar                      |
-| `?debias=1`       | Start with the positional bias removed ([INSID3](https://github.com/visinf/INSID3)-style)                 |
+| `?debias=0`       | Keep the positional bias (it is removed by default, [INSID3](https://github.com/visinf/INSID3)-style)     |
 | `?ep=wasm`        | Force the WebAssembly backend (`?ep=webgpu` tries WebGPU first, the default when `shader-f16` is available) |
 | `?coi=0`          | Skip the cross-origin isolation service worker (single-threaded wasm, about 2 s per prompt)              |
 | `?proxy=0`        | Run wasm inference on the main thread instead of a worker                                                 |
@@ -139,8 +139,8 @@ The scene, model and prompt lists come from [`web/config.json`](web/config.json)
 | `scene.rgb`               |    ✓     | RGB COG for display (`make_mosaic.py --web_out`)                                                    |
 | `scene.embeddings`        |    ✓     | 64-band uint8 PCA COG (`embed.py --output_fn`)                                                      |
 | `scene.pca`               |    ✓     | PCA model written next to the COG (`<name>.pca.json`)                                               |
-| `scene.posbasis`          |          | Positional subspace (`<name>.posbasis.bin`); the debias toggle is disabled without it               |
-| `scene.posnorm`           |          | Precomputed debiased norms for the global level (`<name>.posnorm.bin`), so debias turns on instantly |
+| `scene.posbasis`          |          | Positional subspace (`<name>.posbasis.bin`); without it the positional bias is kept                 |
+| `scene.posnorm`           |          | Precomputed debiased norms for the global level (`<name>.posnorm.bin`), so it needs no computing     |
 | `scene.max_global_tokens` |          | Token budget of the scene-wide level (default `2500000`)                                            |
 | `model`                   |    ✓     | ONNX text encoder; `<model>.sha256` next to it, if present, is the browser cache key                |
 | `vocab`                   |    ✓     | CLIP BPE vocabulary (`bpe_simple_vocab_16e6.txt`)                                                   |
