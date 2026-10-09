@@ -1,0 +1,49 @@
+{
+  "scene": {
+    "name": "San Diego, CA",
+    "rgb": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/naip_2022_san_diego_3x3_rgb.tif",
+    "embeddings": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/naip_2022_san_diego_3x3_dinotxt_pca64_2x_s256.tif",
+    "pca": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/naip_2022_san_diego_3x3_dinotxt_pca64_2x_s256.pca.json",
+    "posbasis": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/naip_2022_san_diego_3x3_dinotxt_pca64_2x_s256.posbasis.bin",
+    "posnorm": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/naip_2022_san_diego_3x3_dinotxt_pca64_2x_s256.posnorm.bin",
+    "subtitle": "NAIP 2022"
+  },
+  "model": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/models/text_encoder.onnx",
+  "vocab": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/models/bpe_simple_vocab_16e6.txt",
+  "background": [
+    "buildings",
+    "road",
+    "trees",
+    "grass",
+    "water",
+    "parking lot",
+    "bare soil",
+    "houses",
+    "concrete",
+    "sand"
+  ],
+  "examples": [
+    "runway",
+    "golf course",
+    "ships",
+    "shipyard",
+    "marina",
+    "train yard",
+    "baseball field",
+    "football field",
+    "bridge",
+    "highway",
+    "construction site",
+    "aircraft carrier",
+    "beach",
+    "solar panels",
+    "swimming pools",
+    "buildings",
+    "road",
+    "trees"
+  ],
+  "point_vocab": {
+    "strings": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/vocab.json",
+    "embeddings": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/data/vocab_embeddings.bin"
+  }
+}

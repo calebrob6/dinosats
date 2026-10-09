@@ -1,0 +1,891 @@
+airport runway
+airport terminal
+airplane
+airplanes parked at gates
+helicopter
+helipad
+hangar
+taxiway
+aircraft apron
+highway
+freeway interchange
+highway overpass
+bridge
+road
+paved road
+dirt road
+gravel road
+residential street
+cul-de-sac
+dead-end street
+intersection
+roundabout
+alley
+driveway
+sidewalk
+bike path
+trail
+footpath
+parking lot
+parking garage
+parking spaces
+cars
+cars in a parking lot
+truck
+trucks
+semi trailers
+bus
+bus depot
+bus stop
+train
+train yard
+railroad tracks
+rail yard
+train station
+light rail station
+container yard
+shipping containers
+cargo port
+dock
+pier
+wharf
+boat ramp
+marina
+boats
+sailboats
+yachts
+ships
+cargo ship
+cruise ship
+navy ship
+shipyard
+dry dock
+harbor
+jetty
+breakwater
+seawall
+ocean
+sea
+bay
+beach
+sandy beach
+shoreline
+surf
+waves
+lagoon
+estuary
+wetland
+marsh
+mudflat
+salt marsh
+river
+creek
+stream
+drainage channel
+concrete channel
+canal
+lake
+pond
+reservoir
+retention pond
+swimming pool
+backyard pool
+water
+calm water
+turbulent water
+water treatment plant
+sewage treatment plant
+water tank
+water tower
+storage tank
+oil storage tanks
+fuel tanks
+oil refinery
+power plant
+power substation
+power lines
+transmission towers
+solar panels
+solar farm
+wind turbine
+cell tower
+radio antenna
+construction site
+excavation
+bulldozer
+crane
+cranes
+scaffolding
+under construction building
+graded dirt lot
+vacant lot
+empty lot
+bare soil
+bare ground
+dirt
+dry dirt
+sand
+sand dunes
+rocks
+rocky hillside
+boulders
+cliff
+bluff
+canyon
+hills
+mountain
+ridge
+desert
+dry riverbed
+gully
+erosion
+landslide
+quarry
+gravel pit
+mine
+landfill
+junkyard
+scrapyard
+salvage yard
+recycling center
+dump
+trees
+forest
+dense forest
+woodland
+palm trees
+tree canopy
+street trees
+oak trees
+eucalyptus trees
+pine trees
+orchard
+avocado orchard
+citrus grove
+vineyard
+nursery
+greenhouse
+greenhouses
+farmland
+cropland
+crop field
+plowed field
+fallow field
+irrigated field
+row crops
+pasture
+ranch
+corral
+barn
+farm buildings
+farmhouse
+silo
+livestock
+cattle
+horses
+horse arena
+stable
+grass
+lawn
+mowed grass
+dry grass
+tall grass
+shrubs
+shrubland
+chaparral
+scrub brush
+brush
+bushes
+hedge
+garden
+vegetable garden
+community garden
+flower beds
+park
+city park
+playground
+picnic area
+dog park
+campground
+cemetery
+golf course
+golf fairway
+golf green
+sand bunker
+driving range
+mini golf
+baseball field
+baseball diamond
+softball field
+football field
+soccer field
+rugby field
+football stadium
+stadium
+sports complex
+tennis courts
+tennis court
+basketball court
+volleyball court
+running track
+race track
+horse racing track
+skate park
+swimming pool complex
+ice rink
+amusement park
+roller coaster
+zoo
+fairgrounds
+theme park
+buildings
+building
+houses
+single family homes
+suburban neighborhood
+residential neighborhood
+tract housing
+mobile home park
+trailer park
+apartment complex
+apartment buildings
+condominiums
+townhouses
+high-rise buildings
+skyscrapers
+downtown
+downtown city center
+commercial buildings
+office buildings
+office park
+business park
+shopping center
+strip mall
+shopping mall
+big box store
+supermarket
+retail store
+gas station
+car dealership
+car lot
+auto repair shop
+car wash
+drive-through
+restaurant
+hotel
+resort
+motel
+casino
+convention center
+warehouse
+distribution center
+industrial buildings
+industrial area
+factory
+manufacturing plant
+storage units
+self storage facility
+shipping yard
+lumber yard
+concrete plant
+cement plant
+asphalt plant
+steel mill
+chemical plant
+brewery
+data center
+hospital
+medical center
+school
+elementary school
+high school
+school campus
+university campus
+college campus
+library
+church
+cathedral
+mosque
+temple
+courthouse
+city hall
+government building
+fire station
+police station
+military base
+military barracks
+naval base
+prison
+jail
+embassy
+museum
+theater
+stadium parking lot
+airport parking
+rooftop
+flat roof
+red tile roof
+gray roof
+white roof
+rooftop solar panels
+rooftop equipment
+concrete
+asphalt
+pavement
+paved lot
+plaza
+courtyard
+campus quad
+fountain
+statue
+monument
+tunnel
+dam
+levee
+spillway
+culvert
+aqueduct
+pipeline
+utility corridor
+fence
+wall
+retaining wall
+shadow
+shadows
+dark shadows of buildings
+clouds
+smoke
+fire
+burned area
+wildfire scar
+debris
+trash
+construction materials
+stacked pallets
+stockpile
+gravel stockpile
+sand stockpile
+dirt piles
+mulch
+compost facility
+sports field
+athletic field
+practice field
+open field
+open space
+undeveloped land
+vacant land
+nature preserve
+nature reserve
+coastal bluff
+coastal wetland
+tidal flat
+sandbar
+island
+peninsula
+harbor entrance
+channel markers
+navy fleet
+aircraft carrier
+submarine
+tugboat
+ferry
+ferry terminal
+fishing boats
+boat docks
+boat slips
+boat storage
+rv storage
+rv park
+motorcycles
+bicycles
+people
+crowd
+pedestrians
+street
+main street
+boulevard
+avenue
+highway on-ramp
+highway off-ramp
+toll plaza
+carpool lane
+rest area
+truck stop
+weigh station
+railway crossing
+level crossing
+bridge over a river
+pedestrian bridge
+overpass
+viaduct
+runway threshold markings
+runway markings
+airplane on the tarmac
+airliner
+private jets
+small aircraft
+airfield
+heliport
+control tower
+aircraft maintenance facility
+drone
+rocket
+launch pad
+satellite dish
+observatory
+research facility
+laboratory
+biotech campus
+agricultural field
+tractor
+irrigation pivot
+irrigation canal
+drainage ditch
+aerial view of a city
+aerial view of farmland
+aerial view of a coastline
+aerial view of a harbor
+aerial view of a suburb
+aerial view of a highway
+aerial view of a forest
+aerial view of an airport
+satellite view of buildings
+satellite view of a river
+residential area with swimming pools
+dense urban area
+sparse rural area
+low-density housing
+high-density housing
+industrial park
+shipping port
+container terminal
+cargo cranes
+gantry cranes
+stacked containers
+car carrier ship
+oil tanker
+bulk carrier
+barge
+tug
+patrol boat
+speedboat
+kayaks
+fishing pier
+public pier
+boardwalk
+promenade
+waterfront park
+waterfront homes
+canal homes
+boat house
+yacht club
+sailing club
+marina with boats
+rows of boats
+moored boats
+anchored ships
+ships at sea
+ship wake
+oil spill
+algae bloom
+kelp bed
+sandy shoal
+tidal channel
+river mouth
+river delta
+river bend
+braided river
+oxbow lake
+waterfall
+rapids
+hot spring
+glacier
+snow
+snow covered ground
+ice
+frozen lake
+volcano
+crater
+lava field
+salt flat
+salt evaporation ponds
+aquaculture ponds
+fish farm
+rice paddies
+terraced fields
+center pivot irrigation
+circular fields
+rectangular fields
+strip fields
+orchard rows
+olive grove
+almond orchard
+apple orchard
+palm plantation
+rubber plantation
+tea plantation
+coffee plantation
+sugarcane
+corn field
+wheat field
+soybean field
+cotton field
+hay bales
+harvested field
+bare farmland
+flooded field
+cattle feedlot
+dairy farm
+poultry house
+chicken coops
+pig farm
+sheep pasture
+grain elevator
+grain bins
+farm equipment
+combine harvester
+irrigation reservoir
+farm pond
+windbreak
+tree line
+hedgerow
+riparian vegetation
+mangroves
+swamp
+bog
+peatland
+meadow
+prairie
+savanna
+tundra
+alpine meadow
+rocky outcrop
+scree slope
+sand dune field
+beach dunes
+coastal scrub
+coastal cliffs
+sea cave
+rocky shore
+tide pools
+sea stacks
+harbor breakwater
+lighthouse
+coast guard station
+naval ship
+destroyer
+frigate
+amphibious assault ship
+landing craft
+fighter jets
+military aircraft
+bomber
+cargo plane
+transport aircraft
+airliner at a gate
+jet bridge
+airport apron
+airport runway intersection
+runway with markings
+taxiway intersection
+aircraft parking
+aircraft boneyard
+air traffic control tower
+airport fuel farm
+airport cargo terminal
+airport rental car lot
+airport hotel
+rental car lot
+car storage lot
+new cars lined up
+used car lot
+truck parking
+trailer parking
+bus parking
+school bus yard
+taxi lot
+garage
+carport
+detached garage
+shed
+barn roof
+metal roof
+shingle roof
+tile roof
+green roof
+roof with skylights
+roof with air conditioning units
+large flat roof
+warehouse roof
+big box roof
+mall roof
+stadium roof
+dome
+tent
+temporary structures
+shipping container buildings
+modular buildings
+portable classrooms
+trailers
+campsite
+beach umbrellas
+beach volleyball courts
+beach parking lot
+beach resort
+oceanfront hotel
+tourist attraction
+boat tour dock
+theme park rides
+water park
+ferris wheel
+carnival
+outdoor concert venue
+amphitheater
+outdoor market
+farmers market
+flea market
+street market
+open-air parking
+parking structure roof
+rooftop parking
+multi-level parking garage
+underground parking entrance
+loading dock
+loading bay
+truck loading area
+freight yard
+intermodal yard
+rail siding
+railway switching yard
+train depot
+locomotives
+freight train
+passenger train
+trolley tracks
+tram line
+subway entrance
+metro station
+transit center
+park and ride lot
+bike lanes
+crosswalk
+traffic circle
+traffic lights
+road markings
+lane markings
+turn lane
+highway merge
+highway cloverleaf
+stack interchange
+diamond interchange
+elevated highway
+highway under construction
+road construction
+road paving
+new road
+unpaved road
+farm road
+access road
+service road
+logging road
+forest trail
+hiking trail
+horse trail
+bike trail
+canal towpath
+levee road
+dam crest
+hydroelectric dam
+power canal
+penstock
+cooling towers
+smokestacks
+chimney
+industrial smokestack
+natural gas plant
+gas storage tanks
+oil wells
+oil pumpjacks
+drilling rig
+refinery tanks
+fuel depot
+tank farm
+chemical storage
+wastewater ponds
+settling ponds
+tailings pond
+open pit mine
+strip mine
+sand and gravel operation
+rock quarry
+cement kiln
+brick factory
+sawmill
+lumber mill
+log yard
+paper mill
+food processing plant
+bottling plant
+cold storage warehouse
+fulfillment center
+logistics hub
+truck terminal
+industrial warehouses
+light industrial buildings
+heavy industry
+shipbuilding
+aircraft factory
+auto factory
+car assembly plant
+electronics factory
+semiconductor plant
+solar panel array
+ground-mounted solar
+rooftop solar array
+floating solar
+battery storage facility
+substation yard
+high-voltage towers
+wind farm
+wind turbines in a row
+geothermal plant
+nuclear power plant
+biomass plant
+waste incinerator
+transfer station
+composting site
+construction staging area
+building foundation
+building framing
+house under construction
+new subdivision
+cleared land
+graded pads
+grading and earthwork
+excavated pit
+foundation excavation
+retention basin
+detention basin
+storm drain channel
+flood control channel
+concrete river channel
+river with concrete banks
+bridge piers
+suspension bridge
+cable-stayed bridge
+arch bridge
+drawbridge
+railroad bridge
+highway bridge
+overpass ramps
+underpass
+tunnel entrance
+tunnel portal
+toll booth
+border crossing
+customs checkpoint
+security checkpoint
+military checkpoint
+radar station
+antenna farm
+communications tower
+water reservoir tank
+elevated water tank
+municipal building
+community center
+recreation center
+senior center
+nursing home
+clinic
+medical campus
+hospital helipad
+hospital parking lot
+university stadium
+college dormitories
+student housing
+fraternity houses
+school playground
+school sports field
+school parking lot
+daycare
+preschool
+church parking lot
+church steeple
+synagogue
+buddhist temple
+hindu temple
+shrine
+cemetery with headstones
+mausoleum
+memorial
+war memorial
+historic district
+old town
+colonial buildings
+brick buildings
+glass office towers
+mid-rise buildings
+low-rise buildings
+tall buildings casting shadows
+courtyard buildings
+row houses
+duplexes
+large mansions
+luxury homes
+gated community
+retirement community
+golf course community
+estate
+ranch house
+farm compound
+rural homestead
+hunting cabin
+cabins
+lodge
+ski resort
+ski slopes
+ski lift
+campground with tents
+rv campground
+picnic shelters
+park pavilion
+botanical garden
+arboretum
+orchard park
+sports park
+disc golf course
+archery range
+shooting range
+motocross track
+go-kart track
+race car track
+drag strip
+airstrip
+dirt airstrip
+seaplane base
+heliport on a rooftop
+helicopter landing pad
+drone landing pad
+launch complex
+rocket test stand
+telescope dome
+research station
+weather station
+agricultural research station
+experimental plots
+test fields
+sports practice fields
+cricket field
+polo field
+equestrian center
+riding arena
+racetrack stables
+dog track
+bullring
+fairground midway
+parade ground
+military parade ground
+training area
+firing range
+airfield with hangars

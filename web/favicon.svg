@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="tile"><rect width="64" height="64" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="#5d6b3c"/>
+    <path d="M0 0h26v20H0z" fill="#7d8650"/>
+    <path d="M26 0h20v14H26z" fill="#a39468"/>
+    <path d="M46 0h18v24H46z" fill="#6f7a45"/>
+    <path d="M0 20h18v18H0z" fill="#9c8a5c"/>
+    <path d="M18 14h28v16H18z" fill="#4f5d33"/>
+    <path d="M46 24h18v16H46z" fill="#b2a27a"/>
+    <path d="M0 38h30v26H0z" fill="#3f6f86"/>
+    <path d="M30 30h34v34H30z" fill="#7a7f52"/>
+    <path d="M0 52c10-6 20-4 30-8l0 20H0z" fill="#2f5d75"/>
+    <path d="M-2 33 L66 23" stroke="#d9cfb4" stroke-width="2.2"/>
+    <g stroke="#0e0b08" stroke-opacity="0.22" stroke-width="1">
+      <path d="M16 0v64M32 0v64M48 0v64M0 16h64M0 32h64M0 48h64"/>
+    </g>
+  </g>
+  <path fill="#e37148" stroke="#1a1612" stroke-width="2.4" stroke-linejoin="round"
+    d="M47 9 C51 7 56 8 57 11 C57.5 13 55 14 52 14 C49 14.5 47.5 16 47 19 C46 25 45 29 45 33 C46 36 45 40 43 42 L43 54 L38 54 L38 45 C34 46 30 46 27 45 L27 54 L21 54 L21 43 C15 42 9 46 3 50 C8 42 14 33 24 30 C32 27 38 27 41 28 C41 20 42 12 47 9 Z"/>
+  <circle cx="51.5" cy="10.8" r="1.1" fill="#1a1612"/>
+</svg>

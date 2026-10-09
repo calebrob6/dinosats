@@ -1,0 +1,27 @@
+# Environments and build output
+/.venv/
+/node_modules/
+__pycache__/
+*.pyc
+/web/vendor/
+/web/coi-serviceworker.js
+
+# Credentials
+/aws.json
+/.env
+
+# Meta's dinov3 code and the model weights (see the README)
+/dinov3
+/weights
+
+# NAIP downloads, mosaics and the hosted assets (on Source Cooperative)
+/data
+/web/data
+/web/models
+*.tif
+
+# Local scratch
+/dinotxt-demo
+/dinotxt-demo.zip
+*.tmp.*
+smoke_test*.png

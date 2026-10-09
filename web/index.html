@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DinoSats — Open-Vocabulary Search over Aerial Imagery</title>
+
+    <meta name="author" content="Caleb Robinson" />
+    <meta name="description" content="DinoSats — type a phrase and see where it shows up across 1 billion pixels of NAIP aerial imagery over San Diego. DINOv3 patch embeddings are precomputed; the dino.txt text encoder runs in your browser." />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DinoSats — Open-Vocabulary Search over Aerial Imagery" />
+    <meta property="og:description" content="Search 1 billion pixels of NAIP aerial imagery over San Diego with words. DINOv3 + dino.txt, running in the browser." />
+    <meta property="og:url" content="https://calebrob.com/dinosats/" />
+    <meta property="og:image" content="https://calebrob.com/dinosats/teaser.jpg" />
+    <meta property="og:image:alt" content="DinoSats — a heatmap of where a text query matches over NAIP aerial imagery of San Diego." />
+    <meta property="article:author" content="Caleb Robinson" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DinoSats — Open-Vocabulary Search over Aerial Imagery" />
+    <meta name="twitter:description" content="Search 1 billion pixels of NAIP aerial imagery over San Diego with words. DINOv3 + dino.txt, running in the browser." />
+    <meta name="twitter:image" content="https://calebrob.com/dinosats/teaser.jpg" />
+    <meta name="twitter:creator" content="@calebrob6" />
+
+    <link rel="icon" href="favicon.ico" sizes="32x32" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="theme-color" content="#1a1612" />
+    <script>
+      // ?coi=0 skips the COOP/COEP service worker (single-threaded wasm on hosts without isolation headers).
+      window.coi = { quiet: true, shouldRegister: () => new URLSearchParams(location.search).get("coi") !== "0" };
+      // ?debug=true shows the developer controls (NAIP and positional-bias toggles, timings).
+      if (/^(true|1)$/i.test(new URLSearchParams(location.search).get("debug") ?? "")) document.documentElement.classList.add("debug");
+    </script>
+    <script src="coi-serviceworker.js"></script>
+    <link rel="modulepreload" href="vendor/ol.js" />
+    <link rel="modulepreload" href="search.js" />
+    <link rel="modulepreload" href="tour.js" />
+    <link rel="preload" href="config.json" as="fetch" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link rel="stylesheet" href="vendor/ol.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div id="left" class="stack">
+      <header class="card title-card">
+        <button type="button" id="help" class="help-btn" title="About this app" aria-label="About this app" aria-expanded="false" disabled>?</button>
+        <div class="title-main">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect class="logo-tile" x="3" y="3" width="58" height="58" rx="12" />
+            <path class="logo-grid" d="M22.3 3v58M41.7 3v58M3 22.3h58M3 41.7h58" />
+            <path
+              class="logo-dino"
+              d="M47 9C51 7 56 8 57 11C57.5 13 55 14 52 14C49 14.5 47.5 16 47 19C46 25 45 29 45 33C46 36 45 40 43 42L43 54L38 54L38 45C34 46 30 46 27 45L27 54L21 54L21 43C15 42 9 46 3 50C8 42 14 33 24 30C32 27 38 27 41 28C41 20 42 12 47 9Z"
+            />
+            <circle class="logo-eye" cx="51.5" cy="10.8" r="1.6" />
+          </svg>
+          <span class="title-word">Dino</span><span class="title-accent">Sats</span>
+        </div>
+        <div class="title-sub">Open-vocabulary retrieval · DINOv3</div>
+        <div class="title-meta">
+          <span class="title-author">By <a href="https://calebrob.com" target="_blank" rel="noreferrer">Caleb Robinson</a></span>
+        </div>
+      </header>
+
+      <section class="card" id="query-card">
+        <div class="section-label">Query</div>
+        <form id="query-form" class="search" autocomplete="off">
+          <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" /><path d="M10.5 10.5L14 14" /></svg>
+          <input id="query" type="search" placeholder="Describe what to find" spellcheck="false" aria-label="Query" />
+          <kbd>/</kbd>
+        </form>
+        <div id="examples" class="chips"></div>
+        <div id="status-row" data-state="busy">
+          <span class="dot"></span><span id="status">Loading…</span>
+        </div>
+        <p id="mode-note" class="mode-note" hidden></p>
+        <div id="activity" hidden>
+          <span id="activity-text"></span>
+          <progress id="progress" max="1" value="0"></progress>
+        </div>
+      </section>
+
+      <section class="card" id="display">
+        <div class="section-label">Display</div>
+        <div class="seg" role="radiogroup" aria-label="Score">
+          <input type="radio" name="mode" id="mode-relative" value="relative" checked /><label for="mode-relative">Relative</label>
+          <input type="radio" name="mode" id="mode-raw" value="raw" /><label for="mode-raw">Raw cosine</label>
+        </div>
+        <label class="slider-row">
+          <span>Threshold</span>
+          <input type="range" id="threshold" min="0" max="0.95" step="0.01" value="0.1" />
+          <output id="threshold-out"></output>
+        </label>
+        <label class="slider-row">
+          <span>Opacity</span>
+          <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.8" />
+          <output id="opacity-out"></output>
+        </label>
+        <div id="legend">
+          <canvas id="legend-bar" width="256" height="1"></canvas>
+          <div class="legend-labels"><span id="legend-lo">0</span><span id="legend-title"></span><span id="legend-hi">1</span></div>
+        </div>
+        <div class="debug-only toggles">
+          <label class="switch"><input type="checkbox" id="naip" checked /> NAIP imagery</label>
+          <label class="switch" title="Project out the positional subspace of the backbone tokens (INSID3)"><input type="checkbox" id="debias" /> Remove positional bias</label>
+        </div>
+        <details>
+          <summary>Background prompts</summary>
+          <p class="hint">The relative score is a softmax of the query against these, one per line.</p>
+          <textarea id="background" rows="8" spellcheck="false"></textarea>
+        </details>
+      </section>
+    </div>
+
+    <div id="right" class="stack">
+      <div class="card scene-card">
+        <div class="scene-title" id="scene-name"></div>
+        <div class="scene-sub" id="scene-sub"></div>
+        <div class="stats" id="scene-stats"></div>
+      </div>
+      <section class="card" id="matches-card">
+        <div class="list-head">
+          <button type="button" class="section-label card-toggle" aria-expanded="true" aria-controls="matches" disabled>Top matches<svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" /></svg></button>
+          <label class="switch"><input type="checkbox" id="peaks-on" aria-label="List the best locations" /></label>
+        </div>
+        <ol id="matches" class="loc-list"></ol>
+      </section>
+      <section class="card" id="point-card" hidden>
+        <div class="list-head">
+          <button type="button" class="section-label card-toggle" aria-expanded="true" aria-controls="point-matches">Clicked point<svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" /></svg></button>
+          <button type="button" id="point-close" class="icon-btn" aria-label="Clear point">×</button>
+        </div>
+        <div id="point-info" class="coords"></div>
+        <ol id="point-matches" class="point-list"></ol>
+      </section>
+    </div>
+
+    <div id="hints" class="card kbd-hint"><kbd>/</kbd> search <span class="sep"></span><kbd>Space</kbd> heatmap <span class="sep"></span><kbd>Shift</kbd> + click describe a point</div>
+    <footer id="timing" class="debug-only"></footer>
+    <div id="hover" hidden></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

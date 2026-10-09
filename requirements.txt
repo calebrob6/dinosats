@@ -1,0 +1,14 @@
+# The Python pipeline (download, mosaic, embed, export); the web app needs none of it. Tested versions.
+# Also needs Meta's dinov3 code cloned into dinov3/ and azcopy on the PATH (see the README).
+torch>=2.14
+torchvision>=0.29
+numpy>=2.5
+rasterio>=1.5
+safetensors>=0.8
+huggingface_hub>=2.1
+ftfy>=6.3
+regex>=2026.9.29
+tqdm>=4.70
+onnx>=1.23
+onnxruntime>=1.30
+onnxscript>=0.7
