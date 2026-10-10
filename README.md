@@ -123,7 +123,7 @@ The app consists only of static files, so you can host the code, the data and th
 - The [DINOv3 and dino.txt](https://github.com/facebookresearch/dinov3) models are from Meta and are released under the [DINOv3 License](https://ai.meta.com/resources/models-and-libraries/dinov3-license/).
 - The CLIP BPE tokenizer vocabulary is redistributed by Meta under its [MIT license](https://dl.fbaipublicfiles.com/dinov2/thirdparty/LICENSE).
 - The method for removing the positional bias is from [INSID3](https://github.com/visinf/INSID3).
-- Thanks to [Blaz Rolih](https://huggingface.co/blaz-r) for introducing us to the dino.txt text encoder and for the tip about removing DINOv3's positional bias.
+- Thanks to [Blaz Rolih](https://huggingface.co/blaz-r) for introducing me to the dino.txt text encoder and for the tip about removing DINOv3's positional bias.
 
 ## Citation
 
