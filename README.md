@@ -2,7 +2,7 @@
 
 **Jump to: [Using the app](#using-the-app) | [How it works](#how-it-works) | [Run it locally](#run-it-locally) | [Make your own scene](#make-your-own-scene) | [Configuration](#configuration) | [Hosting](#hosting) | [Credits](#credits) | [Citation](#citation) | [License](#license)**
 
-Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *aircraft carrier*, and DinoSats shows where they are across 380 km² of San Diego, right in your browser. It compares precomputed [DINOv3](https://github.com/facebookresearch/dinov3) embeddings of the imagery with your prompt, encoded by [dino.txt](https://arxiv.org/abs/2412.16334), a text model trained to align with DINOv3.
+Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *aircraft carrier*, and DinoSats shows where they are across 380 km² of San Diego, in your browser. It compares precomputed [DINOv3](https://github.com/facebookresearch/dinov3) embeddings of the imagery with your prompt, encoded by [dino.txt](https://arxiv.org/abs/2412.16334), a text model trained to align with DINOv3.
 
 **Try it: [calebrob.com/dinosats](https://calebrob.com/dinosats/)**
 
@@ -10,24 +10,24 @@ Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *ai
   <a href="https://calebrob.com/dinosats/"><img src="web/teaser.jpg" alt="DinoSats teaser: a heatmap for the prompt beach over San Diego, tracing the ocean beaches of Coronado and the Silver Strand" width="100%"></a>
 </p>
 
-*The prompt* beach *traces the ocean beaches of Coronado and the Silver Strand.*
+*The heatmap for the prompt* beach *highlights the ocean beaches of Coronado and the Silver Strand.*
 
 ## Using the app
 
-- **Search**: type a prompt (`/` jumps to the box) or click an example. About 900 common prompts are precomputed. Anything else downloads a 664 MB text encoder the first time, which the browser normally caches.
-- **Top matches**: switch this on to list the 10 best places, and click one to fly there. They're picked from a coarse (about 20 m) view of the whole scene, so small objects may only show up once you zoom in.
-- **Describe a spot**: `Shift` + click shows the words that best match that location.
+- **Search**: type a prompt (`/` moves the cursor to the search box) or click an example. About 900 common prompts are precomputed. Anything else downloads a 664 MB text encoder the first time, which the browser normally caches.
+- **Top matches**: switch this on to list the 10 highest-scoring places, and click one to zoom to it. They're chosen from a coarse (about 20 m) version of the whole scene, so small objects may only appear after you zoom in.
+- **Describe a location**: `Shift` + click shows the words that best match that location.
 - **Display**: switch between the relative score and raw similarity, and change the threshold, opacity and background prompts. `Space` hides or shows the heatmap.
 
 ## How it works
 
-DINOv3, an image model from Meta, turns each patch of imagery (about 5 m across) into a list of numbers describing what it looks like. Its companion text model, dino.txt, was trained to turn text into the same kind of list, so a patch of runway and the word *runway* end up close together. Patches that match your prompt light up.
+DINOv3, an image model from Meta, turns each patch of imagery (about 5 m across) into a vector, a list of numbers that describes what the patch looks like. Its companion text model, dino.txt, was trained to turn text into vectors of the same kind, so the vector for a patch of runway is similar to the vector for the word *runway*. The app scores each patch by how similar its vector is to your prompt's.
 
-- **Ahead of time**, we embed [NAIP](https://planetarycomputer.microsoft.com/dataset/naip) aerial imagery (0.6 m per pixel, 2022) with DINOv3 and compress each patch to 64 bytes. San Diego comes to 16.5 million patches in a 1.1 GB Cloud-Optimized GeoTIFF.
-- **In your browser**, the text model runs on your own device with onnxruntime-web. There's no backend: the site is just static files. The map loads a coarse version of the embeddings first and streams sharper blocks as you zoom in.
-- **Scores are relative.** Each patch shows how much better your prompt fits than generic background prompts like *water*, *road* and *buildings*, which makes the heatmap much easier to read than raw similarity.
+- **Ahead of time**, we embed [NAIP](https://planetarycomputer.microsoft.com/dataset/naip) aerial imagery (0.6 m per pixel, 2022) with DINOv3 and compress each patch to 64 bytes. San Diego has 16.5 million patches, stored in a 1.1 GB Cloud-Optimized GeoTIFF.
+- **In your browser**, the text model runs on your own device with onnxruntime-web. There is no backend server; the site consists of static files. The map loads a coarse version of the embeddings first and downloads higher-resolution blocks as you zoom in.
+- **Scores are relative.** Each patch's score is how much better it matches your prompt than generic background prompts such as *water*, *road* and *buildings*. This makes the heatmap much easier to read than raw similarity.
 
-It's zero-shot, and dino.txt was trained on web photos, not aerial imagery. It does best on things that are large and distinctive from above (runways, golf courses, marinas, sports fields) and worse on small or ambiguous objects. Think of it as a fast way to explore a scene, not a finished detector.
+It's zero-shot, and dino.txt was trained on web photos, not aerial imagery. It does best on things that are large and distinctive from above (runways, golf courses, marinas, sports fields) and worse on small or ambiguous objects. It is a quick way to explore a scene, not a replacement for a trained detector.
 
 ## Run it locally
 
@@ -60,7 +60,7 @@ curl -L -o weights/bpe_simple_vocab_16e6.txt.gz https://dl.fbaipublicfiles.com/d
 
 The dino.txt weights on Hugging Face are a mirror of the file Meta distributes through the [dinov3 repo](https://github.com/facebookresearch/dinov3#pretrained-heads---zero-shot-tasks-with-dinotxt).
 
-**Build the scene.** These are the commands for San Diego. For another area, swap in other NAIP quarter quad IDs and file names.
+**Build the scene.** These are the commands for San Diego. For another area, replace the NAIP quarter quad IDs and file names with your own.
 
 ```bash
 # 1. Download the imagery
@@ -84,7 +84,7 @@ sed -E 's#https://[^"]*/dinosats/##' web/config.json > web/data/local.json
 python3 serve.py
 ```
 
-Quad IDs look like `3211723_ne`: the north-east quarter of quad 23 in the 1° cell at 32° N, 117° W, with quads numbered 1 to 64 from the north-west corner. Every script takes `--help`.
+A quad ID such as `3211723_ne` means the north-east quarter of quad 23 in the 1° cell at 32° N, 117° W, with quads numbered 1 to 64 from the north-west corner. Every script takes `--help`.
 
 ## Configuration
 
@@ -110,7 +110,7 @@ URL options: `?config=<url>` loads another config, `?debug=true` shows developer
 
 ## Hosting
 
-The app is just static files, so you can host the code, data and model on any cloud object store or web server. The host needs to serve https and support HTTP Range requests, since the app reads the GeoTIFFs block by block, and if it's on a different origin from the app, send CORS headers that expose `Content-Range`. The demo's code is deployed to GitHub Pages by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to `main`.
+The app consists only of static files, so you can host the code, data and model on any cloud object store or web server. The host needs to serve https and support HTTP Range requests, since the app reads the GeoTIFFs block by block, and if it's on a different origin from the app, send CORS headers that expose `Content-Range`. The demo's code is deployed to GitHub Pages by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to `main`.
 
 To check a running copy end to end, run `npx playwright install chromium` once, then `node scripts/smoke_test.mjs [url]`.
 
