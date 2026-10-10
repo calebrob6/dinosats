@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "coi-serviceworker": "^0.1.7",
-    "esbuild": "^0.25.0",
-    "playwright": "^1.56.0"
+    "esbuild": "^0.25.0"
   }
 }

@@ -117,8 +117,6 @@ The app also accepts these URL options: `?config=<url>` loads a different config
 
 The app consists only of static files, so you can host the code, the data and the model on any cloud object store or web server. The server needs to use https and support HTTP Range requests, because the app reads the GeoTIFFs one block at a time. If the data is on a different origin from the app, the server also needs to send CORS headers that expose `Content-Range`. The code for the demo is deployed to GitHub Pages by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to `main`.
 
-To check that a running copy works end to end, run `npx playwright install chromium` once, and then run `node scripts/smoke_test.mjs [url]`.
-
 ## Credits
 
 - The imagery is from [NAIP](https://planetarycomputer.microsoft.com/dataset/naip) (USDA), accessed through the Microsoft Planetary Computer, and is in the public domain.

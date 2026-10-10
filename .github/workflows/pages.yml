@@ -29,8 +29,6 @@ jobs:
       # Bundles OpenLayers/geotiff/proj4 and copies onnxruntime-web and coi-serviceworker into web/
       - name: Build
         run: npm ci && npm run build
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
       # The data and text encoder are served from Source Cooperative (absolute URLs in web/config.json)
       - name: Assemble site
         run: cp -r web _site
