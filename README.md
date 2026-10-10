@@ -12,10 +12,10 @@ This repo provides:
 ℹ️ The hosted demo at **[calebrob.com/dinosats](https://calebrob.com/dinosats/)** covers 380 km² of San Diego (a 3 × 3 mosaic of 2022 NAIP quarter quads at 0.6 m: 1.06 B pixels, 16.5 M embeddings at 4.8 m). The embeddings, imagery and text encoder are hosted on [Source Cooperative](https://source.coop/calebrob6/geospatialml); this repo lets you rebuild them for any NAIP area.
 
 <p align="center">
-  <a href="https://calebrob.com/dinosats/"><img src="web/teaser.jpg" alt="DinoSats teaser: a heatmap for the prompt ships over San Diego Bay, with the top ten matches along the naval piers" width="100%"></a>
+  <a href="https://calebrob.com/dinosats/"><img src="web/teaser.jpg" alt="DinoSats teaser: a heatmap for the prompt beach over San Diego, tracing the ocean beaches of Coronado and the Silver Strand" width="100%"></a>
 </p>
 
-**Figure 1.** DinoSats over San Diego (NAIP 2022) for the prompt *ships*. The heatmap is the per-patch probability of the prompt against a set of background prompts (*buildings*, *road*, *water*, …). The harbour, shipyards and naval piers light up, and the top ten matches line the piers of Naval Base San Diego.
+**Figure 1.** DinoSats over San Diego (NAIP 2022) for the prompt *beach*. The heatmap is the per-patch probability of the prompt against a set of background prompts (*buildings*, *road*, *water*, …). The ocean beaches of Coronado and the Silver Strand light up as a thin line, along with the shores of Mission Bay, and the top ten matches are on Coronado's beaches and the tip of Point Loma.
 
 dino.txt was trained to align DINOv3 features with captions of web photos, not aerial imagery, so this is zero-shot. It works well for things that are distinctive at a few metres per patch (runways, golf courses, marinas, ships, sports fields) and less well for small or ambiguous objects, and scores are only meaningful relative to the background prompts. Treat it as an exploration tool: a fast way to see what open-vocabulary features can find in a scene before training anything.
 
