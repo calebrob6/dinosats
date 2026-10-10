@@ -1,6 +1,8 @@
 # DinoSats
 
-Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *aircraft carrier*, and DinoSats shows where they are across 380 km² of San Diego, right in your browser.
+**Jump to: [Using the app](#using-the-app) | [How it works](#how-it-works) | [Run it locally](#run-it-locally) | [Make your own scene](#make-your-own-scene) | [Configuration](#configuration) | [Hosting](#hosting) | [Credits](#credits) | [Citation](#citation) | [License](#license)**
+
+Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *aircraft carrier*, and DinoSats shows where they are across 380 km² of San Diego, right in your browser. It compares precomputed [DINOv3](https://github.com/facebookresearch/dinov3) embeddings of the imagery with your prompt, encoded by [dino.txt](https://arxiv.org/abs/2412.16334), a text model trained to align with DINOv3.
 
 **Try it: [calebrob.com/dinosats](https://calebrob.com/dinosats/)**
 
@@ -19,7 +21,7 @@ Search aerial imagery with words. Type *runway*, *marina*, *solar panels* or *ai
 
 ## How it works
 
-DinoSats uses Meta's [DINOv3](https://github.com/facebookresearch/dinov3) image model and [dino.txt](https://arxiv.org/abs/2412.16334), its companion text model. DINOv3 turns each patch of imagery (about 5 m across) into a list of numbers describing what it looks like, and dino.txt was trained to turn text into the same kind of list, so a patch of runway and the word *runway* end up close together. Patches that match your prompt light up.
+DINOv3, an image model from Meta, turns each patch of imagery (about 5 m across) into a list of numbers describing what it looks like. Its companion text model, dino.txt, was trained to turn text into the same kind of list, so a patch of runway and the word *runway* end up close together. Patches that match your prompt light up.
 
 - **Ahead of time**, we embed [NAIP](https://planetarycomputer.microsoft.com/dataset/naip) aerial imagery (0.6 m per pixel, 2022) with DINOv3 and compress each patch to 64 bytes. San Diego comes to 16.5 million patches in a 1.1 GB Cloud-Optimized GeoTIFF.
 - **In your browser**, the text model runs on your own device with onnxruntime-web. There's no backend: the site is just static files. The map loads a coarse version of the embeddings first and streams sharper blocks as you zoom in.
@@ -78,16 +80,18 @@ mkdir -p web/data
 .venv/bin/python scripts/export_text_encoder.py
 
 # 6. Copy the config with local paths (edit the file names if yours differ), then open http://localhost:8766/?config=data/local.json
-sed 's#https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/calebrob6/geospatialml/dinosats/##' web/config.json > web/data/local.json
+sed -E 's#https://[^"]*/dinosats/##' web/config.json > web/data/local.json
 python3 serve.py
 ```
 
 Quad IDs look like `3211723_ne`: the north-east quarter of quad 23 in the 1° cell at 32° N, 117° W, with quads numbered 1 to 64 from the north-west corner. Every script takes `--help`.
 
-<details>
-<summary><b>Configuration</b></summary>
+## Configuration
 
-The app reads [`web/config.json`](web/config.json). Paths can be relative to `web/` or full URLs.
+The app reads [`web/config.json`](web/config.json), which lists the scene's files, the text model, the background prompts and the example prompts. Paths can be relative to `web/` or full URLs.
+
+<details>
+<summary>All fields and URL options</summary>
 
 | Field | What it is |
 |:--|:--|
@@ -104,22 +108,11 @@ URL options: `?config=<url>` loads another config, `?debug=true` shows developer
 
 </details>
 
-<details>
-<summary><b>Hosting</b></summary>
+## Hosting
 
-The app is a static site. GitHub Pages serves the code, deployed by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to `main`. The data and model are too big for Pages, so they live on [Source Cooperative](https://source.coop/calebrob6/geospatialml). Any host works if it serves https with HTTP Range requests and, for another origin, CORS headers that expose `Content-Range`.
+The app is just static files, so you can host the code, data and model on any cloud object store or web server. The host needs to serve https and support HTTP Range requests, since the app reads the GeoTIFFs block by block, and if it's on a different origin from the app, send CORS headers that expose `Content-Range`. The demo's code is deployed to GitHub Pages by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to `main`.
 
-To upload a new scene (this needs Source Cooperative credentials), do a dry run first so nothing gets overwritten by accident:
-
-```bash
-aws s3 sync web/data   s3://calebrob6/geospatialml/dinosats/data/   --endpoint-url https://data.source.coop --dryrun
-aws s3 sync web/data   s3://calebrob6/geospatialml/dinosats/data/   --endpoint-url https://data.source.coop
-aws s3 sync web/models s3://calebrob6/geospatialml/dinosats/models/ --endpoint-url https://data.source.coop
-```
-
-`node scripts/smoke_test.mjs [url]` runs a headless end-to-end check against a running copy (run `npx playwright install chromium` first).
-
-</details>
+To check a running copy end to end, run `npx playwright install chromium` once, then `node scripts/smoke_test.mjs [url]`.
 
 ## Credits
 
